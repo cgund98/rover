@@ -6,7 +6,7 @@
 #
 # Authors:
 #   * Siegfried-A. Gevatter
-#   * Edited by Callum Gundlach
+# Edited by Callum Gundlach
 
 import curses
 import math
@@ -38,6 +38,7 @@ class Velocity(object):
         assert step > 0 and step <= self._num_steps
         max_value = self._min + self._step_incr * (step - 1)
         return value * max_value
+        #return 0 
 
 class TextWindow():
 
@@ -132,10 +133,10 @@ class KeyTeleop():
             curses.KEY_DOWN:  (-1,  0),
             curses.KEY_LEFT:  ( 0,  1),
             curses.KEY_RIGHT: ( 0, -1),
-	    ord('w'):	( 1,  0),
-            ord('s'):	(-1,  0),
-            ord('a'):	( 0,  1),
-            ord('d'):	( 0, -1),
+	    #ord('w'):	( 1,  0),
+            #ord('s'):	(-1,  0),
+            #ord('a'):	( 0,  1),
+            #ord('d'):	( 0, -1),
 
         }
         speed_bindings = {
@@ -192,6 +193,7 @@ class SimpleKeyTeleop():
         self._backward_rate = rospy.get_param('~backward_rate', 0.5)
         self._rotation_rate = rospy.get_param('~rotation_rate', 1.0)
         self._last_pressed = {}
+        self._last_key = None
         self._angular = 0
         self._linear = 0
 
@@ -229,8 +231,13 @@ class SimpleKeyTeleop():
         now = rospy.get_time()
         keys = []
         for a in self._last_pressed:
-            if now - self._last_pressed[a] < 0.4:
-                keys.append(a)
+            if a == ord('w') or a == ord('s'):
+                if now - self._last_pressed[a] < .4:
+                    keys = [a]
+                    break
+            if now - self._last_pressed[a] < 0.2:
+                keys = [a]
+                #keys.append(a)
         linear = 0.0
         angular = 0.0
         for k in keys:
